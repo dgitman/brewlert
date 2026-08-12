@@ -11,11 +11,12 @@ export function SubscribeForm() {
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    const formElement = event.currentTarget;
     if (!formulae && !casks) {
       setStatus({ kind: "error", message: "Choose formulae, casks, or both." });
       return;
     }
-    const form = new FormData(event.currentTarget);
+    const form = new FormData(formElement);
     setStatus({ kind: "loading" });
     try {
       const response = await fetch("/api/subscribe", {
@@ -26,7 +27,7 @@ export function SubscribeForm() {
       const result = await response.json() as { message?: string };
       if (!response.ok) throw new Error(result.message ?? "Unable to subscribe right now.");
       setStatus({ kind: "success", message: result.message ?? "You’re on the list." });
-      event.currentTarget.reset();
+      formElement.reset();
     } catch (error) {
       setStatus({ kind: "error", message: error instanceof Error ? error.message : "Unable to subscribe." });
     }
