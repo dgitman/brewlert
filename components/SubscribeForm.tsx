@@ -1,5 +1,6 @@
 "use client";
 
+import { sendGAEvent } from "@next/third-parties/google";
 import { FormEvent, useState } from "react";
 
 type Status = { kind: "idle" | "loading" | "success" | "error"; message?: string };
@@ -41,7 +42,13 @@ export function SubscribeForm() {
         <label><input type="checkbox" checked={formulae} onChange={(event) => setFormulae(event.target.checked)} /><span />Formulae</label>
         <label><input type="checkbox" checked={casks} onChange={(event) => setCasks(event.target.checked)} /><span />Casks</label>
       </div>
-      <button type="submit" disabled={status.kind === "loading"}>
+      <button
+        type="submit"
+        disabled={status.kind === "loading"}
+        onClick={() => sendGAEvent("event", "get_digest_click", {
+          digest_preferences: formulae && casks ? "formulae_and_casks" : formulae ? "formulae" : casks ? "casks" : "none",
+        })}
+      >
         {status.kind === "loading" ? "Joining…" : "Get the digest"}
       </button>
       <p className={`form-note ${status.kind === "error" ? "error" : ""}`} role="status">
