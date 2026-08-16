@@ -55,7 +55,7 @@ export default async function Home() {
       <section className="hero shell" id="top">
         <div className="hero-copy">
           <h1>The week in<span className="hero-line">Homebrew, delivered.</span></h1>
-          <p>New formulae and casks. One clean digest every Sunday.</p>
+          <p>A free weekly Homebrew newsletter featuring new formulae and casks, with descriptions and install commands.</p>
           <SubscribeForm />
         </div>
 

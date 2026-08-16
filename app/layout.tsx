@@ -5,13 +5,28 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Brewlert — The week in Homebrew, delivered",
-  description: "A clean Sunday digest of newly added Homebrew formulae and casks.",
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"),
+  metadataBase: new URL("https://brewlert.com"),
+  title: "Brewlert — New Homebrew Formulae & Casks Weekly",
+  description: "A free weekly Homebrew newsletter featuring new formulae and casks, with descriptions and install commands.",
+  alternates: {
+    canonical: "/",
+  },
   openGraph: {
-    title: "Brewlert",
-    description: "New Homebrew formulae and casks. One clean digest every Sunday.",
+    title: "Brewlert — New Homebrew Formulae & Casks Weekly",
+    description: "Discover newly added Homebrew formulae and casks in one clean newsletter every Sunday.",
+    url: "/",
+    siteName: "Brewlert",
     type: "website",
+    locale: "en_US",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Brewlert — New Homebrew Formulae & Casks Weekly",
+    description: "Discover newly added Homebrew formulae and casks in one clean newsletter every Sunday.",
+  },
+  robots: {
+    index: true,
+    follow: true,
   },
 };
 
