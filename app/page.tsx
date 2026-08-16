@@ -1,6 +1,8 @@
-import { BrandMark } from "@/components/BrandMark";
+import { JsonLd } from "@/components/JsonLd";
+import { SiteFooter, SiteHeader } from "@/components/SiteChrome";
 import { SubscribeForm } from "@/components/SubscribeForm";
 import { Addition, getLatestAdditions, installCommand } from "@/lib/homebrew";
+import { absoluteUrl } from "@/lib/site";
 
 function ArrowIcon() {
   return (
@@ -37,20 +39,18 @@ function AdditionRow({ addition }: { addition: Addition }) {
 export default async function Home() {
   const additions = await getLatestAdditions();
   const preview = additions.slice(0, 4);
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: "Brewlert",
+    url: absoluteUrl("/"),
+    description: "A free weekly newsletter featuring newly added Homebrew formulae and casks, with descriptions and install commands.",
+  };
 
   return (
     <main>
-      <nav className="nav shell" aria-label="Main navigation">
-        <a href="#top" className="wordmark" aria-label="Brewlert home">
-          <BrandMark />
-          <span>Brewlert</span>
-        </a>
-        <div className="nav-links">
-          <a href="#latest">Latest</a>
-          <a href="#how-it-works">How it works</a>
-          <a href="#subscribe" className="nav-cta">Subscribe</a>
-        </div>
-      </nav>
+      <JsonLd data={jsonLd} />
+      <SiteHeader />
 
       <section className="hero shell" id="top">
         <div className="hero-copy">
@@ -110,10 +110,7 @@ export default async function Home() {
         </div>
       </section>
 
-      <footer className="footer shell">
-        <p>Powered by the <a href="https://formulae.brew.sh/docs/api/" target="_blank" rel="noreferrer">Homebrew API ↗</a> <span>·</span> <a href="https://github.com/Homebrew" target="_blank" rel="noreferrer">Source on GitHub ↗</a></p>
-        <p>Brewlert is an independent project and is not affiliated with Homebrew.</p>
-      </footer>
+      <SiteFooter />
     </main>
   );
 }

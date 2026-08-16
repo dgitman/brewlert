@@ -24,6 +24,8 @@ type CommittedMetadata = {
   homepage?: string;
 };
 
+const NON_ADDITION_TITLE = /:\s*(?:renamed?|removed?|deprecated?|disabled?)\b/i;
+
 const FALLBACK_ADDITIONS: Addition[] = [
   {
     name: "vi-sql",
@@ -159,7 +161,10 @@ async function searchGitHub(kind: AdditionKind, start: string, end: string) {
     next: { revalidate: 3600 },
   });
   if (!response.ok) throw new Error(`GitHub search failed (${response.status})`);
-  return (await response.json() as GitHubSearchResponse).items;
+  const { items } = await response.json() as GitHubSearchResponse;
+  // Labels can outlive the change they originally described. Exclude lifecycle
+  // follow-ups that still carry a "new formula" or "new cask" label.
+  return items.filter((item) => !NON_ADDITION_TITLE.test(item.title));
 }
 
 async function enrich(item: GitHubSearchItem, kind: AdditionKind): Promise<Addition> {

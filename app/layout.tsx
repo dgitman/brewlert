@@ -6,7 +6,10 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://brewlert.com"),
-  title: "Brewlert — New Homebrew Formulae & Casks Weekly",
+  title: {
+    default: "Brewlert — New Homebrew Formulae & Casks Weekly",
+    template: "%s | Brewlert",
+  },
   description: "A free weekly Homebrew newsletter featuring new formulae and casks, with descriptions and install commands.",
   alternates: {
     canonical: "/",
