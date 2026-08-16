@@ -1,9 +1,23 @@
-import { Addition, installCommand } from "@/lib/homebrew";
+import { installCommand, type Addition } from "@/lib/homebrew";
 
 function escapeHtml(value: string) {
   return value.replace(/[&<>'"]/g, (character) => ({
     "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#039;", '"': "&quot;",
   })[character] ?? character);
+}
+
+function webUrl(value: string | null) {
+  if (!value) return null;
+  try {
+    const protocol = new URL(value).protocol;
+    return protocol === "http:" || protocol === "https:" ? value : null;
+  } catch {
+    return null;
+  }
+}
+
+function formulaeUrl(addition: Addition) {
+  return `https://formulae.brew.sh/${addition.kind}/${encodeURIComponent(addition.name)}`;
 }
 
 function formatRange(start: Date, end: Date) {
@@ -19,12 +33,17 @@ export function digestHtml(additions: Addition[], start: Date, end: Date) {
     const name = escapeHtml(addition.displayName);
     const description = escapeHtml(addition.description);
     const version = addition.version ? `<span style="color:#8c8880">${escapeHtml(addition.version)}</span>` : "";
+    const homepageUrl = webUrl(addition.homepage);
+    const homepage = homepageUrl
+      ? `<br><a href="${escapeHtml(homepageUrl)}" style="display:inline-block;margin-top:8px;color:#9a5a00;font:13px Arial,sans-serif">Homepage ↗</a>`
+      : "";
+    const formulae = `<br><a href="${escapeHtml(formulaeUrl(addition))}" style="display:inline-block;margin-top:8px;color:#9a5a00;font:13px Arial,sans-serif">Homebrew Formulae ↗</a>`;
     return `<tr><td style="padding:22px 0;border-bottom:1px solid #dedbd3">
       <table role="presentation" width="100%"><tr>
         <td style="vertical-align:top"><div style="font:700 18px Arial,sans-serif;color:#171512">${name} ${version}</div>
         <div style="margin-top:6px;font:15px/1.5 Arial,sans-serif;color:#5d5951">${description}</div>
         <code style="display:inline-block;margin-top:10px;padding:5px 8px;background:#efede7;border-radius:4px;color:#171512">${escapeHtml(installCommand(addition))}</code></td>
-        <td align="right" style="width:80px;vertical-align:top"><span style="font:12px monospace;color:#9a5a00;text-transform:uppercase">${type}</span><br><a href="${addition.prUrl}" style="display:inline-block;margin-top:10px;color:#9a5a00;font:13px Arial,sans-serif">PR ↗</a></td>
+        <td align="right" style="width:130px;vertical-align:top"><span style="font:12px monospace;color:#9a5a00;text-transform:uppercase">${type}</span><br><a href="${escapeHtml(addition.prUrl)}" style="display:inline-block;margin-top:10px;color:#9a5a00;font:13px Arial,sans-serif">PR ↗</a>${homepage}${formulae}</td>
       </tr></table>
     </td></tr>`;
   }).join("");

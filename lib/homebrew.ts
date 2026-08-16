@@ -19,6 +19,11 @@ type GitHubSearchItem = {
 
 type GitHubSearchResponse = { items: GitHubSearchItem[] };
 
+type CommittedMetadata = {
+  description?: string;
+  homepage?: string;
+};
+
 const FALLBACK_ADDITIONS: Addition[] = [
   {
     name: "vi-sql",
@@ -100,6 +105,45 @@ function parseTitle(title: string, kind: AdditionKind) {
   };
 }
 
+function decodeRubyString(value: string) {
+  return value.replace(/\\(["\\])/g, "$1");
+}
+
+export function parseCommittedMetadata(diff: string, name: string): CommittedMetadata {
+  const expectedFilename = `${name}.rb`;
+  const section = diff.split(/(?=^diff --git )/m).find((candidate) => {
+    const header = candidate.slice(0, candidate.indexOf("\n"));
+    const targetPath = header.match(/^diff --git a\/.+ b\/(.+)$/)?.[1];
+    return targetPath?.split("/").at(-1) === expectedFilename;
+  });
+  if (!section) return {};
+
+  const field = (name: "desc" | "homepage") => {
+    const match = section.match(new RegExp(`^\\+\\s*${name}\\s+"((?:[^"\\\\]|\\\\.)*)"\\s*$`, "m"));
+    return match ? decodeRubyString(match[1]) : undefined;
+  };
+
+  const description = field("desc");
+  const homepage = field("homepage");
+  return {
+    ...(description ? { description } : {}),
+    ...(homepage ? { homepage } : {}),
+  };
+}
+
+async function getCommittedMetadata(item: GitHubSearchItem, name: string): Promise<CommittedMetadata> {
+  try {
+    const response = await fetch(`${item.html_url}.diff`, {
+      headers: { "User-Agent": "brewlert.com" },
+      next: { revalidate: 3600 },
+    });
+    if (!response.ok) return {};
+    return parseCommittedMetadata(await response.text(), name);
+  } catch {
+    return {};
+  }
+}
+
 async function searchGitHub(kind: AdditionKind, start: string, end: string) {
   const repo = kind === "formula" ? "Homebrew/homebrew-core" : "Homebrew/homebrew-cask";
   const label = kind === "formula" ? "new formula" : "new cask";
@@ -121,6 +165,7 @@ async function searchGitHub(kind: AdditionKind, start: string, end: string) {
 async function enrich(item: GitHubSearchItem, kind: AdditionKind): Promise<Addition> {
   const parsed = parseTitle(item.title, kind);
   const endpoint = `https://formulae.brew.sh/api/${kind}/${encodeURIComponent(parsed.name)}.json`;
+  const committedMetadataPromise = getCommittedMetadata(item, parsed.name);
   let description = `New Homebrew ${kind}`;
   let homepage: string | null = null;
   let displayName = parsed.displayName;
@@ -146,6 +191,10 @@ async function enrich(item: GitHubSearchItem, kind: AdditionKind): Promise<Addit
   } catch {
     // The GitHub result remains useful if metadata enrichment is temporarily unavailable.
   }
+
+  const committedMetadata = await committedMetadataPromise;
+  description = committedMetadata.description ?? description;
+  homepage = committedMetadata.homepage ?? homepage;
 
   return {
     ...parsed,

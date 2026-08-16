@@ -5,7 +5,7 @@ A Sunday email digest of newly merged Homebrew formulae and casks.
 ## How it works
 
 - Searches merged pull requests labeled `new formula` and `new cask` for the previous Sunday–Saturday window.
-- Fetches only the matching per-item Homebrew JSON endpoints to add descriptions, versions, and homepages.
+- Reads descriptions and homepages from the formula or cask file committed by each pull request, with the per-item Homebrew JSON endpoint as a fallback and for display metadata.
 - Stores subscribers in one of three Resend segments: formulae, casks, or both.
 - Sends one Resend Broadcast per segment at 13:00 UTC every Sunday via Vercel Cron.
 
