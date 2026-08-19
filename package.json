@@ -4,10 +4,13 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "dev:secure": "op run --env-file=.env -- npm run dev",
     "build": "next build",
     "start": "next start",
+    "start:secure": "op run --env-file=.env -- npm run start",
     "typecheck": "tsc --noEmit",
-    "setup:resend": "node scripts/setup-resend.mjs"
+    "setup:resend": "node scripts/setup-resend.mjs",
+    "setup:resend:secure": "op run --env-file=.env -- npm run setup:resend"
   },
   "dependencies": {
     "@next/third-parties": "^16.3.0",
