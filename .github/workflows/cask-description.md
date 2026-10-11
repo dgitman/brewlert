@@ -4,7 +4,9 @@ on:
   workflow_dispatch:
 permissions:
   contents: read
-engine: copilot
+engine:
+  id: copilot
+  model: auto
 timeout-minutes: 15
 tools:
   bash: ["cat", "curl", "jq"]
