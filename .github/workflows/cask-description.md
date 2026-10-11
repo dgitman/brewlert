@@ -8,6 +8,7 @@ engine:
   id: copilot
   # Qualify the provider to avoid gh-aw's auto alias falling back to a paid model.
   model: copilot/auto
+  args: ["--model", "auto"]
 timeout-minutes: 15
 tools:
   bash: ["cat", "curl", "jq"]
