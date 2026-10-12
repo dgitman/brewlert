@@ -15,7 +15,7 @@ async function main() {
   // autoChatEndpoint.ts. Only the account-authorized response chooses a model.
   const session = await new Promise((resolve, reject) => {
     const request = http.request(new URL('/models/session', base), { method: 'POST', headers: {
-      'content-type': 'application/json', 'x-github-api-version': '2025-07-16',
+      'content-type': 'application/json', 'x-github-api-version': '2026-08-01',
     } }, response => {
       let body = '';
       response.on('data', chunk => { body += chunk; if (body.length > 1000000) request.destroy(new Error('Auto session response too large')); });
@@ -42,7 +42,7 @@ async function main() {
       res.writeHead(404).end('Unsupported inference route');
       return;
     }
-    const headers = { 'content-type': 'application/json', 'Copilot-Session-Token': session.session_token };
+    const headers = { 'content-type': 'application/json', 'x-github-api-version': '2026-08-01', 'Copilot-Session-Token': session.session_token };
     const upstream = http.request(new URL('/chat/completions', base), { method: 'POST', headers }, response => {
       console.log(`[free-auto] Auto inference status=${response.statusCode}`);
       res.writeHead(response.statusCode, response.headers);
