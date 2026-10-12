@@ -6,9 +6,8 @@ permissions:
   contents: read
 engine:
   id: copilot
-  # Qualify the provider to avoid gh-aw's auto alias falling back to a paid model.
-  model: copilot/auto
-  args: ["--model", "auto"]
+  # AWF runs CLI in offline provider mode; use the Free Auto model from its catalog.
+  model: copilot/gpt-5.6-luna-free-auto
 timeout-minutes: 15
 tools:
   bash: ["cat", "curl", "jq"]
