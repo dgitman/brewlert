@@ -6,8 +6,9 @@ permissions:
   contents: read
 engine:
   id: copilot
-  # AWF runs CLI in offline provider mode; use the Free Auto model from its catalog.
-  model: copilot/gpt-5.6-luna-free-auto
+  model: copilot/auto
+  harness:
+    use: copilot_free_auto.cjs
 timeout-minutes: 15
 tools:
   bash: ["cat", "curl", "jq"]
@@ -26,6 +27,9 @@ safe-outputs:
 steps:
   - name: Select one eligible cask
     run: node scripts/select-description-cask.mjs /tmp/gh-aw/cask-candidate.json
+pre-agent-steps:
+  - name: Install Free Auto endpoint adapter
+    run: cp scripts/copilot_free_auto.cjs "${RUNNER_TEMP}/gh-aw/actions/copilot_free_auto.cjs"
 ---
 
 # Prepare one Homebrew cask description proposal
